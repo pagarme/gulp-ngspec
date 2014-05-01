@@ -1,0 +1,22 @@
+{
+  "name": "gulp-ngspec",
+  "version": "0.0.1",
+  "description": "Hard file management for gulp projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pagarme/gulp-ngspec"
+  },
+  "keywords": [
+    "gulpplugin"
+  ],
+  "author": "Jonathan Lima",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pagarme/gulp-ngspec/issues"
+  },
+  "homepage": "https://github.com/pagarme/gulp-ngspec"
+}
