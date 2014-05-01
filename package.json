@@ -18,5 +18,12 @@
   "bugs": {
     "url": "https://github.com/pagarme/gulp-ngspec/issues"
   },
-  "homepage": "https://github.com/pagarme/gulp-ngspec"
+  "homepage": "https://github.com/pagarme/gulp-ngspec",
+  "dependencies": {
+    "gulp-plumber": "~0.6.1",
+    "minimatch": "~0.2.14",
+    "vinyl": "~0.2.3",
+    "through2": "~0.4.1",
+    "gulp-util": "~2.2.14"
+  }
 }

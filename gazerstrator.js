@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var fs = require('fs');
 var events = require('events');
 var util = require('util');
@@ -29,7 +28,7 @@ Gazerstrator.prototype._fileChanged = function(file, handler) {
 		this.queue = [];
 		
 		setTimeout(function() {
-			_.each(self.queue, function(item) {
+			self.queue.forEach(function(item) {
 				item.handler(item.file);
 			});
 

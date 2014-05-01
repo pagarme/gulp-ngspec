@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var Gazerstrator = require('./gazerstrator.js');
 var File = require('vinyl');
 var gutil = require('gulp-util');
@@ -33,7 +32,7 @@ var outputBuilders = {
 	css: function(project, files) {
 		var data = "";
 
-		_.each(files, function(s) {
+		files.forEach(function(s) {
 			data += '<link rel="stylesheet" type="text/css" href="' + s.relative + '" />\n';	
 		});
 
@@ -42,7 +41,7 @@ var outputBuilders = {
 	js: function(project, files) {
 		var data = "";
 
-		_.each(files, function(s) {
+		files.forEach(function(s) {
 			data += '<script src="' + s.relative + '" type="text/javascript"></script>\n';	
 		});
 
@@ -82,7 +81,7 @@ ProjectBuilder.prototype.build = function(name, match, dependencies, handler) {
 	files = files.concat(this._matchFiles('app', match));
 	
 	if (this.config.watch) {
-		_.each(files, function(file) {
+		files.forEach(function(file) {
 			this.gazer.watch(file, function(file) {
 				if (!pog.files) {
 					pog.files = [];
@@ -111,7 +110,7 @@ ProjectBuilder.prototype.addOutput = function(group, files) {
 		this.outputGroups[group] = [];
 	}
 
-	if (!_.isArray(files)) {
+	if (files.constructor != Array) {
 		files = [ files ];
 	}
 
@@ -175,15 +174,18 @@ ProjectBuilder.prototype._processFile = function(file) {
 
 ProjectBuilder.prototype._touchAndWalk = function(name) {
 	var topLevels = [];
+	var depends = [];
 
-	var depends = _.where(this.tm.tasks, function(task) {
-		return task.dep && task.dep.indexOf(name) != -1;
+	this.tm.tasks.forEach(function(task) {
+		if (task.dep && task.dep.indexOf(name) != -1) {
+			depends.push(task);
+		}
 	});
 
 	this.tm._resetTask(this.tm.tasks[name]);
 
 	if (depends.length > 0) {
-		_.each(depends, function(task) {
+		depens.forEach(function(task) {
 			topLevels = topLevels.concat(this._touchAndWalk(task.name));
 		}, this);
 	} else {
@@ -196,7 +198,7 @@ ProjectBuilder.prototype._touchAndWalk = function(name) {
 ProjectBuilder.prototype._firePendingTasks = function() {
 	var topLevels = [];
 	
-	_.each(this.pendingTasks, function(name) {
+	this.pendingTasks.forEach(function(name) {
 		topLevels = topLevels.concat(this._touchAndWalk(name));
 	}, this);
 
@@ -217,7 +219,7 @@ ProjectBuilder.prototype._invalidateTaskTree = function(task) {
 ProjectBuilder.prototype._createStream = function(files) {
 	var stream = through.obj();
 
-	_.each(files, function(file) {
+	files.forEach(function(file) {
 		stream.push(file);
 	});
 
@@ -236,9 +238,9 @@ ProjectBuilder.prototype._matchFiles = function(group, match) {
 	var includes = [], excludes = [];
 	var result = [];
 
-	match = _.isArray(match) ? match : [ match ];
+	match = match.constructor == Array ? match : [ match ];
 
-	_.each(match, function(g) {
+	match.forEach(function(g) {
 		var target = includes;
 
 		if (g.charAt(0) == '!') {
@@ -249,7 +251,7 @@ ProjectBuilder.prototype._matchFiles = function(group, match) {
 		target.push(minimatch.makeRe(g, {}));
 	});
 
-	_.each(input, function(file) {
+	input.forEach(function(file) {
 		var ok = includes.length == 0;
 
 		for (var i = 0; i < excludes.length; i++) {
@@ -300,13 +302,14 @@ ProjectBuilder.prototype._processProject = function(baseDirectory) {
 	};
 
 	var loadVendor = function(vendor) {
-		_.forOwn(vendor, function(value, key) {
-			var files = _.isArray(value) ? value : [ value ];
+		for (var key in vendor) {
+			var value = vendor[key];
+			var files = value.constructor == Array ? value : [ value ];
 	
-			_.each(files, function(file) {
+			files.forEach(function(file) {
 				includeFile.apply(this, [ 'vendor', cwdFull, this.vendor.path, path.join(key, file) ]);
 			}, this);
-		}, this);
+		}
 	};
 
 	var loadModule = function(base, name) {
@@ -326,7 +329,7 @@ ProjectBuilder.prototype._processProject = function(baseDirectory) {
 			loadVendor.apply(this, [ module.vendor ]);
 		}
 
-		_.each(module.files, function(file) {
+		module.files.forEach(function(file) {
 			includeFile.apply(this, [ 'app', base, moduleBase, file ]);
 		}, this);
 	};
@@ -357,7 +360,7 @@ ProjectBuilder.prototype._processProject = function(baseDirectory) {
 			loadVendor.apply(this, [ package.vendor ]);
 		}
 
-		_.each(package.modules, function(name) {
+		package.modules.forEach(function(name) {
 			loadModule.apply(this, [ packageBase, name ]);
 		}, this);
 	};
@@ -366,9 +369,9 @@ ProjectBuilder.prototype._processProject = function(baseDirectory) {
 		loadVendor.apply(this, [ spec.vendor.modules ]);
 	}
 
-	_.each(spec.packages, loadPackage, this);
+	spec.packages.forEach(loadPackage, this);
 
-	_.each(spec.modules, function(name) {
+	spec.modules.forEach(function(name) {
 		loadModule.apply(this, [ baseFull, name ]);
 	}, this);	
 };
